@@ -9,6 +9,6 @@ class Strategy:
     def run(self):
         print('Running strategy with data : ', self.data)
         start = time.time()
-        while time.time() - start < 20:
+        while time.time() - start < 10:
             continue
-        return {'Strategy 2': self.data}
+        return {'Strategy 3': self.data}
