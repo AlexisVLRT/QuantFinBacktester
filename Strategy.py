@@ -11,4 +11,4 @@ class Strategy:
         start = time.time()
         while time.time() - start < 20:
             continue
-        return {'Strategy 1': self.data}
+        return {'Strategy 2': self.data}
