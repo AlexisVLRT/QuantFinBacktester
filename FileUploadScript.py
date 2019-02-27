@@ -1,4 +1,6 @@
 import requests
+import io
+import pickle
 
-r = requests.post('http://149.91.83.188:80/upload', files={'upload_file': open('helloworld.pickle', 'rb')})
+r = requests.post('http://localhost:9999/upload', files={'upload_file': io.BytesIO(pickle.dumps('lel'))})
 print(r.text)
