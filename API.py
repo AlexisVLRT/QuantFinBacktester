@@ -21,4 +21,4 @@ def ingest():
 
 if __name__ == '__main__':
     port = 9999
-    run(host='localhost', port=port)
+    run(host='0.0.0.0', port=port)
