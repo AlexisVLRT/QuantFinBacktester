@@ -1,4 +1,3 @@
-from Strategy import Strategy
 import pickle
 import requests
 import io
@@ -19,6 +18,8 @@ class Mapper:
         while self.tasks_in_progress:
             time.sleep(0.1)
         print(self.reducer.raw_results)
+        with open('results' 'wb') as f:
+            f.writelines(self.reducer.raw_results)
 
     def run(self):
         while len(tasks):
@@ -30,8 +31,7 @@ class Mapper:
 
     def post_task(self, task_data):
         print('Posting task')
-        data = pickle.dumps(task_data)
-        r = requests.post('http://{}:{}/upload'.format(self.swarm_host, self.swarm_port), files={'script': open('Strategy.py', 'rb'), 'data': io.BytesIO(data)})
+        r = requests.post('http://{}:{}/upload'.format(self.swarm_host, self.swarm_port), files={'script': open('Strategy.py', 'rb'), 'data': open('Data/{}_5.pickle'.format(task_data), 'rb')})
         print(r.text)
         self.reducer.add_result(r.json())
         self.tasks_in_progress -= 1
@@ -46,6 +46,6 @@ class Reducer:
 
 
 if __name__ == '__main__':
-    tasks = ['A first task', 'Another task']
-    swarm_host, swarm_port = 'localhost', 9999
-    Mapper(tasks, Reducer(), 1, swarm_host, swarm_port)
+    tasks = ['AAPL', 'AMZN']
+    swarm_host, swarm_port = '149.91.83.188', 80
+    Mapper(tasks, Reducer(), 7, swarm_host, swarm_port)
