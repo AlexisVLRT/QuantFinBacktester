@@ -10,4 +10,4 @@ class Strategy:
         start = time.time()
         while time.time() - start < 10:
             continue
-        return {'Strategy 3': self.data}
+        return {'Strategy 4': self.data}

@@ -7,7 +7,9 @@ import time
 
 
 class Mapper:
-    def __init__(self, tasks, reducer, slaves_count):
+    def __init__(self, tasks, reducer, slaves_count, host, port):
+        self.swarm_host = host
+        self.swarm_port = port
         self.tasks = tasks
         self.reducer = reducer
         self.slave_count = slaves_count
@@ -26,10 +28,11 @@ class Mapper:
                 del tasks[0]
             time.sleep(0.1)
 
-    def post_task(self, task):
+    def post_task(self, task_data):
         print('Posting task')
-        bundle = pickle.dumps(Strategy(task))
-        r = requests.post('http://149.91.83.188:80/upload', files={'upload_file': io.BytesIO(bundle)})
+        data = pickle.dumps(task_data)
+        r = requests.post('http://{}:{}/upload'.format(self.swarm_host, self.swarm_port), files={'script': open('Strategy.py', 'rb'), 'data': io.BytesIO(data)})
+        print(r.text)
         self.reducer.add_result(r.json())
         self.tasks_in_progress -= 1
 
@@ -43,5 +46,6 @@ class Reducer:
 
 
 if __name__ == '__main__':
-    tasks = ['A task', 'Another task']
-    Mapper(tasks, Reducer(), 1)
+    tasks = ['A first task', 'Another task']
+    swarm_host, swarm_port = 'localhost', 9999
+    Mapper(tasks, Reducer(), 1, swarm_host, swarm_port)
