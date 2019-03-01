@@ -1,7 +1,6 @@
 import pickle
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
-import Analyser
 
 
 class Strategy:
@@ -90,4 +89,3 @@ if __name__ == '__main__':
     data = pickle.load(open('Data/{}_5.pickle'.format(ticker), 'rb'))
     strat = Strategy(data, 5)
     calls = strat.run()
-    Analyser.analyse(ticker, 5, calls)

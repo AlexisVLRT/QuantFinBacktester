@@ -1,6 +1,6 @@
 import pickle
 import requests
-import io
+import os
 from threading import Thread
 import time
 
@@ -18,8 +18,8 @@ class Mapper:
         while self.tasks_in_progress:
             time.sleep(0.1)
         print(self.reducer.raw_results)
-        with open('results' 'wb') as f:
-            f.writelines(self.reducer.raw_results)
+        with open('results', 'w') as f:
+            f.writelines(str(self.reducer.raw_results))
 
     def run(self):
         while len(tasks):
@@ -46,6 +46,8 @@ class Reducer:
 
 
 if __name__ == '__main__':
-    tasks = ['AAPL', 'AMZN']
+    filenames = os.listdir('Data')
+    tasks = [name.split('_')[0] for name in filenames]
+    print(tasks)
     swarm_host, swarm_port = '149.91.83.188', 80
     Mapper(tasks, Reducer(), 7, swarm_host, swarm_port)
