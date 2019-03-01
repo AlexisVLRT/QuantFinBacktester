@@ -1,6 +1,5 @@
 import pickle
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
 
 
 class Strategy:
@@ -8,30 +7,30 @@ class Strategy:
         self.period = period
         self.day_length = 480 // period
         self.data = data
-        self.start_offset = self.day_length * 66  # About 3 months
+        self.start_offset = int(self.day_length * 66 * 3)  # About 3 months
         self.current_timestamp = None
         self.position = 0
-        self.calls = {}
+        self.calls = []
 
     def buy(self):
         print('Buying')
         self.position = (1, self.current_timestamp)
-        self.calls.update({self.current_timestamp: 'buy'})
+        self.calls.append((self.current_timestamp, 'buy'))
 
     def sell(self):
         print('Selling')
         self.position = 0
-        self.calls.update({self.current_timestamp: 'sell'})
+        self.calls.append((self.current_timestamp, 'sell'))
 
     def short(self):
         print('Shorting')
         self.position = (-1, self.current_timestamp)
-        self.calls.update({self.current_timestamp: 'short'})
+        self.calls.append((self.current_timestamp, 'short'))
 
     def cover(self):
         print('Covering')
         self.position = 0
-        self.calls.update({self.current_timestamp: 'cover'})
+        self.calls.append((self.current_timestamp, 'cover'))
 
     def run(self):
         for i in range(self.start_offset, len(self.data)):
@@ -42,8 +41,7 @@ class Strategy:
             ema12 = self.data.loc[:self.current_timestamp].ewm(span=12 * self.day_length).mean()
             macd = ema12 - ema24
             signal = macd.ewm(span=9 * self.day_length).mean()
-            diff = (macd - signal)
-            diff = pd.Series(StandardScaler(with_mean=False).fit_transform(diff.values.reshape(-1, 1)).flatten())
+            diff = pd.Series(((macd - signal)/(macd - signal).std()).values[:, 0])
             diff2 = (diff.fillna(0).diff().ewm(span=0.5 * self.day_length).mean()).fillna(0) * 200
 
             # Buy when diff < 0 and diff2 goes > 0
