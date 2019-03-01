@@ -44,5 +44,5 @@ def run_strategy(data):
 if __name__ == '__main__':
     result = -1
     port = 9999
-     # run(host='0.0.0.0', port=port)
-    run(host='localhost', port=port)
+    run(host='0.0.0.0', port=port)
+    # run(host='localhost', port=port)
