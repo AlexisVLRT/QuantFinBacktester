@@ -7,15 +7,15 @@ from threading import Thread
 import Strategy
 
 
-@route('/upload', method='POST')
-def ingest():
+@route('/upload/<task>', method='POST')
+def ingest(task='task'):
     global result
     try:
         request.files.get('script').save('Strategy.py', overwrite=True)
         data = pickle.loads(request.files.get('data').file.read())
 
         reload(Strategy)
-        Thread(target=run_strategy, args=(data, )).start()
+        Thread(target=run_strategy, args=(task, data)).start()
         result = 202
 
     except Exception as e:
@@ -35,10 +35,10 @@ def get_result():
         return {'response': 200, 'data': ret_val}
 
 
-def run_strategy(data):
+def run_strategy(task, data):
     global result
     reload(Strategy)
-    result = Strategy.Strategy(data).run()
+    result = {task: Strategy.Strategy(data).run()}
 
 
 if __name__ == '__main__':
