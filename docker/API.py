@@ -14,9 +14,8 @@ def ingest(task='task'):
         request.files.get('script').save('Strategy.py', overwrite=True)
         data = pickle.loads(request.files.get('data').file.read())
 
-        reload(Strategy)
-        Thread(target=run_strategy, args=(task, data)).start()
         result = 202
+        Thread(target=run_strategy, args=(task, data)).start()
 
     except Exception as e:
         return {'error': traceback.format_exc()}
