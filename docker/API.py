@@ -37,8 +37,12 @@ def get_result():
 
 def run_strategy(task, data):
     global result
-    reload(Strategy)
-    result = {task: Strategy.Strategy(data).run()}
+    try:
+        reload(Strategy)
+        result = {task: Strategy.Strategy(data).run()}
+
+    except Exception as e:
+        result = {'error': traceback.format_exc()}
 
 
 if __name__ == '__main__':
