@@ -38,6 +38,16 @@ def get_result():
         return {'response': 200, 'data': ret_val}
 
 
+@route('/ping', method='GET')
+def ping():
+    global result
+    uid = hash('It really does not matter what we hash. It changes every time the API starts so..')
+    if result == -1:
+        return {'response': 200, 'id': uid}
+    else:
+        return {'response': 400}
+
+
 def run_strategy(task, data):
     global result
     try:
