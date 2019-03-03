@@ -7,7 +7,7 @@ class Strategy:
         self.period = period
         self.day_length = 480 // period
         self.data = data
-        self.start_offset = int(self.day_length * 66 * 3)  # About 3 months
+        self.start_offset = self.day_length * 66  # About 3 months
         self.current_timestamp = None
         self.position = 0
         self.calls = []
@@ -83,7 +83,8 @@ class Strategy:
 
 
 if __name__ == '__main__':
-    ticker = 'IQ'
+    ticker = 'ADBE'
     data = pickle.load(open('Data/{}_5.pickle'.format(ticker), 'rb'))
-    strat = Strategy(data, 5)
+    strat = Strategy(data)
     calls = strat.run()
+    print(calls)
