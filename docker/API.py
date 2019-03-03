@@ -9,17 +9,17 @@ import Strategy
 
 @route('/upload/<task>', method='POST')
 def ingest(task='task'):
-    global result
+    global result, uid
     try:
         request.files.get('script').save('Strategy.py', overwrite=True)
         data = pickle.loads(request.files.get('data').file.read())
 
         if result == 202:
-            return {'response': 400}
+            return {'response': 400, 'id': uid}
         else:
             result = 202
             Thread(target=run_strategy, args=(task, data)).start()
-            return {'response': 202}
+            return {'response': 202, 'id': uid}
 
     except Exception as e:
         return {'error': traceback.format_exc()}
@@ -27,25 +27,24 @@ def ingest(task='task'):
 
 @route('/result', method='GET')
 def get_result():
-    global result
+    global result, uid
     if result == 202:
-        return {'response': 202}
+        return {'response': 202, 'id': uid}
     elif result == -1:
-        return {'response': 400}
+        return {'response': 400, 'id': uid}
     else:
         ret_val = result
         result = -1
-        return {'response': 200, 'data': ret_val}
+        return {'response': 200, 'data': ret_val, 'id': uid}
 
 
 @route('/ping', method='GET')
 def ping():
-    global result
-    uid = hash('It really does not matter what we hash. It changes every time the API starts so..')
+    global result, uid
     if result == -1:
         return {'response': 200, 'id': uid}
     else:
-        return {'response': 400}
+        return {'response': 400, 'id': uid}
 
 
 def run_strategy(task, data):
@@ -59,6 +58,7 @@ def run_strategy(task, data):
 
 
 if __name__ == '__main__':
+    uid = hash('It really does not matter what we hash. It changes every time the API starts so..')
     result = -1
     port = 9999
     run(host='0.0.0.0', port=port)
