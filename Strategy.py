@@ -44,14 +44,14 @@ class Strategy:
             diff = pd.Series(((macd - signal)/(macd - signal).std()).values[:, 0])
             diff2 = (diff.fillna(0).diff().ewm(span=0.5 * self.day_length).mean()).fillna(0) * 200
 
-            # Buy when diff < 0 and diff2 goes > 0
+            # Buy when diff > 0 and diff2 goes > 0
             if self.position == 0:
-                if diff.iloc[-1] < 0 and diff2.iloc[-1] > 0 > diff2.iloc[-2]:
+                if diff.iloc[-1] > 0 and diff2.iloc[-1] > 0 > diff2.iloc[-2]:
                     self.buy()
 
-            # short when diff > 0 and diff2 goes < 0
+            # short when diff < 0 and diff2 goes < 0
             if self.position == 0:
-                if diff.iloc[-1] > 0 and diff2.iloc[-1] < 0 < diff2.iloc[-2]:
+                if diff.iloc[-1] < 0 and diff2.iloc[-1] < 0 < diff2.iloc[-2]:
                     self.short()
 
             # Sell as soon as we achieve a sufficient year-based profit or after three days if we lose too much
