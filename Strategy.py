@@ -3,11 +3,12 @@ import pandas as pd
 
 
 class Strategy:
-    def __init__(self, data, period=5):
+    def __init__(self, data, start_offset, n_samples, buffer_offset_days=66, period=5):
         self.period = period
         self.day_length = 480 // period
         self.data = data
-        self.start_offset = self.day_length * 66  # About 3 months
+        self.start_offset = self.day_length * buffer_offset_days + start_offset  # About 3 months
+        self.n_samples = n_samples
         self.current_timestamp = None
         self.position = 0
         self.calls = []
@@ -33,7 +34,7 @@ class Strategy:
         self.calls.append((self.current_timestamp, 'cover'))
 
     def run(self):
-        for i in range(self.start_offset, len(self.data)):
+        for i in range(self.start_offset, self.start_offset + self.n_samples):
             if not i % 100:
                 print(i, len(self.data))
             self.current_timestamp = self.data.index[i]
