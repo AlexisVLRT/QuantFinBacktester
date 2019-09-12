@@ -9,22 +9,36 @@ import matplotlib.pyplot as plt
 import seaborn
 
 
-def get_calls(event_id):
+def get_calls(sim_id, ticker):
     client = pymongo.MongoClient(
             host=credentials['mongo']['host'],
             port=credentials['mongo']['port'],
             username=credentials['mongo']['username'],
             password=credentials['mongo']['password'],
     )
-    records = client.qfbt[event_id].find({})
+    records = client.qfbt[sim_id].find({'ticker': ticker})
     out = []
     for record in records:
-        out += ast.literal_eval(record['result'])
+        out += record['results']
     df = pd.DataFrame(out)
     df = df.set_index(0)
     df = df.sort_index()
     df.columns = ['calls']
     return df
+
+
+def get_tickers(sim_id):
+    client = pymongo.MongoClient(
+        host=credentials['mongo']['host'],
+        port=credentials['mongo']['port'],
+        username=credentials['mongo']['username'],
+        password=credentials['mongo']['password'],
+    )
+    records = client.qfbt[sim_id].find({})
+    out = set([])
+    for record in records:
+        out.add(record['ticker'])
+    return list(out)
 
 
 def load_stock_data(ticker):
@@ -67,8 +81,10 @@ def parse_calls(calls):
             position = None
             valid_calls.append([timestamp, call_type])
 
-    df = pd.DataFrame(valid_calls).set_index(0)
-    df.columns = ['calls']
+    df = pd.DataFrame(valid_calls)
+    if len(valid_calls):
+        df = df.set_index(0)
+        df.columns = ['calls']
     return df, valid_calls
 
 
@@ -78,11 +94,12 @@ def generate_results(calls_dict):
 
 
 if __name__ == '__main__':
-    event_ids = ['1566918172-ADBE', '1566918386-CDNS', '1566918429-CENX', '1566918238-SYMC', '1566918260-TLRY', '1566918217-SWKS', '1566918319-TQQQ', '1566918365-CAR', '1566918144-AAPL', '1566918406-CELG', '1566918194-STX', '1566918297-TMUS', '1566918343-TRIP', '1566918472-CMCSA', '1566918275-TLT', '1566918450-CERN']
+    sim_id = '1566984985'
+    tickers = get_tickers(sim_id)
+
     calls_dict = {}
-    for event_id in event_ids:
-        ticker = event_id.split('-')[-1]
-        calls = get_calls(event_id)
+    for ticker in tickers:
+        calls = get_calls(sim_id, ticker)
         valid_calls_df, valid_calls = parse_calls(calls)
         calls_dict[ticker] = valid_calls
         stock_data = load_stock_data(ticker)
